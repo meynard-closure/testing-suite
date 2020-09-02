@@ -49,12 +49,23 @@ jobs:
           name: "Run Unit Tests"
           command: ./vendor/bin/phpunit tests/Unit
 
-      # run browser tests
       - run:
-          name: "Run Unit Tests"
-          command: ./vendor/bin/phpunit tests/Browser
+          name: "Install Dusk and Update Chrome Drivers"
+          command: |
+            composer require --dev laravel/dusk:"^4.0"
+            composer require --dev staudenmeir/dusk-updater
+            php artisan dusk:update --detect
 
-      - store_test_results:
-          path: test-results
-      
-          
+      - run:
+          name: Start Chrome Driver
+          command: ./vendor/laravel/dusk/bin/chromedriver-linux
+          background: true
+
+      - run:
+          name: Run Laravel Server
+          command: php artisan serve
+          background: true
+
+      - run:
+          name: Run Browser Tests Tests
+          command: php artisan dusk
