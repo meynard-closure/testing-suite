@@ -23,10 +23,15 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Generate Application Key
         run: php artisan key:generate
-      - name: Upgrade Chrome Driver
-        run: php artisan dusk:chrome-driver
+      - name: Install Chrome browser
+        run: |
+          sudo apt-get update
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install ./google-chrome-stable_current_amd64.deb -y
       - name: Start Chrome Driver
-        run: ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
+        run: |
+          php artisan dusk:chrome-driver
+          ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
       - name: Run Laravel Server
         run: php artisan serve > /dev/null 2>&1 &
       - name: Run Dusk Tests
